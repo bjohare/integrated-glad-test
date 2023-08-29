@@ -55,27 +55,27 @@ const fragmentSource = `
 
         float alpha = color.a;
 
-        // passed as parameters from the date range filter
-        float startDayIndex = u_var_start;
-        float endDayIndex = u_var_end;
-
-        // scale rgba values from 0 - 1 to 0 - 255
+        // scale rgba values to 0 - 255
         float agreementValue = alpha * 255.; // determines confidence level
-
         float r = color.r * 255.;
         float g = color.g * 255.;
-        // float b = color.b * 255.;
+        float b = color.b * 255.;
 
-        // calculate date, confidence, intensity values
-
+        // calculate date
         float day = r * 255. + g;
 
         // not currently used
         // float confidence = floor(b / 100.) - 1.;
         // float intensity = mod(b, 100.) * 150.;
 
+        // passed as parameters from the date range filter
+        float startDayIndex = u_var_start;
+        float endDayIndex = u_var_end;
+
         if (
-          // day >= 0. &&
+          // some day values are 0!
+          // day == 0. &&
+          day >= 0. &&
           // day >= startDayIndex
           // && day <= endDayIndex &&
           agreementValue > 0.
@@ -248,7 +248,7 @@ export class MapboxCustomLayer {
       gl.uniform1f(program.u_var_end, endDateIndex)
       gl.uniform1f(program.u_layer_opacity, opacity)
       gl.uniform1f(program.u_opacity, fade.opacity)
-      gl.uniform1f(program.u_fade_t, fade.mix)
+      // gl.uniform1f(program.u_fade_t, fade.mix)
       gl.uniform1f(program.u_fade_t, 0)
       gl.uniform2fv(program.u_tl_parent, parentTL)
       gl.uniform1f(program.u_scale_parent, parentScaleBy)
@@ -262,13 +262,19 @@ export class MapboxCustomLayer {
       gl.uniform1i(program.u_texture0, 0)
       gl.uniform1i(program.u_texture1, 1)
 
-      gl.enable(gl.BLEND);
-      gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA)
+      // gl.enable(gl.BLEND);
+
+      gl.disable(gl.BLEND)
+
+      // deckgl blending function
+      // https://github.com/visgl/deck.gl/blob/1b2e92faa58bfa830c1b782bfd0bc8f5337cdd15/modules/mapbox/src/deck-utils.ts#L122
+      // gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA)
 
       gl.drawArrays(gl.TRIANGLES, 0, 6)
     })
 
     this.painter.resetStencilClippingMasks()
+    this.map.triggerRepaint()
 
   }
 

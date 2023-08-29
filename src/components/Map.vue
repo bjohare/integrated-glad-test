@@ -21,9 +21,8 @@ const backgroundLayer = {
     id: 'background',
     type: 'background',
     paint: {
-        'background-color': 'white'
+        'background-color': 'black'
     }
-
 }
 
 const gladSource = {
@@ -45,7 +44,6 @@ const customLayer = {
 const onSliderChange = (e) => {
     filter.value = parseInt(e.srcElement.value);
     gladLayer.value.filter(min.value, filter.value);
-    map.triggerRepaint();
 }
 
 const filterDate = computed(() => {
@@ -62,6 +60,7 @@ onMounted(() => {
         zoom: zoom.value,
         renderWorldCopies: false,
         hash: false,
+        antialias: true
     });
 
     map.on('load', () => {
@@ -72,6 +71,7 @@ onMounted(() => {
     })
 })
 </script>
+
 <template>
     <div id="container">
         <div id="map"></div>
